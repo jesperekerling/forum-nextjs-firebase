@@ -13,8 +13,12 @@ const Register = () => {
       await registerUser(email, password);
       setSuccess('User registered successfully!');
       setError('');
-    } catch (err) {
-      setError('Failed to register user');
+    } catch (err: any) {
+      if (err.code === 'auth/email-already-in-use') {
+        setError('User already exists.');
+      } else {
+        setError('Failed to register user');
+      }
       setSuccess('');
     }
   };

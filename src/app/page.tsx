@@ -40,8 +40,10 @@ const Page = () => {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <h1>Welcome to the Page</h1>
+      
       <h2 className="font-bold text-2xl py-4 pt-10">Login</h2>
       <Login />
+
       <h2 className="font-bold text-2xl pb-4 pt-10">Register</h2>
       <Register />
     </main>
