@@ -20,31 +20,32 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h1>Register</h1>
+    <div className="p-6 bg-white dark:bg-gray-800 dark:text-white rounded-lg shadow-md">
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
+        <div className="mb-4">
+          <label className="block mb-2">Email:</label>
           <input
+            className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-        <div>
-          <label>Password:</label>
+        <div className="mb-4">
+          <label className="block mb-2">Password:</label>
           <input
+            className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button type="submit">Register</button>
+        <button className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" type="submit">Register</button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
+      {success && <p className="mt-4 text-green-500">{success}</p>}
     </div>
   );
 };
