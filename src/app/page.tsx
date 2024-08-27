@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Update import
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import Register from '../components/Register';
-import Login from '../components/Login';
-import { testFirestore } from '../firebase'; // Adjust the path as necessary
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Update import
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Register from "../components/Register";
+import Login from "../components/Login";
+import { testFirestore } from "../firebase"; // Adjust the path as necessary
+import dynamic from "next/dynamic";
 
 const Page = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -24,9 +24,9 @@ const Page = () => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.push('/logged-in');
+        router.push("/landingpage");
       } else {
-        router.push('/login');
+        router.push("/");
       }
     });
 
