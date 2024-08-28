@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Update import
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import Register from "../components/Register";
-import Login from "../components/Login";
+import Register from "../components/RegisterForm";
+import Login from "../components/LoginForm";
+import Header from "../components/layout/Header";
 import { testFirestore } from "../firebase"; // Adjust the path as necessary
 import dynamic from "next/dynamic";
 import ListThreads from "@/components/ListThreads";
@@ -52,18 +53,18 @@ const Page = () => {
 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-xl font-bold pb-10">Forum</h1>
-      
-      <ListThreads />
-      <a href="/create-thread" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">Create Thread</a>
 
-      <h2 className="font-bold text-2xl py-4 pt-10">Login</h2>
-      <Login />
+    <main className="container mx-auto">
+      <Header />
+      <div className="p-5">
+        <h1 className="text-xl font-bold pb-10 text-center">Kul forum</h1>
+        
+        <ListThreads />
+        <a href="/create-thread" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">Create Thread</a>
 
-      <h2 className="font-bold text-2xl pb-4 pt-10">Register</h2>
-      <Register />
-      <button onClick={handleLogout}>Logout</button>
+
+
+      </div>
     </main>
   );
 };

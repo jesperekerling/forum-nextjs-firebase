@@ -1,13 +1,12 @@
 import { db } from '@/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react'
-
-
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 
 type ThreadCategory = "THREAD" | "QNA";
 
 type User = {
-  id: number;
+  id: string;
+  firstName: string;
   userName: string;
   password: string;
 };
@@ -18,24 +17,35 @@ type Thread = {
   category: ThreadCategory;
   creationDate: string;
   description: string;
-  creator: User;
+  creator: string; // UID of the creator
 };
+
 function ListThreads() {
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [users, setUsers] = useState<{ [key: string]: User }>({});
 
-const [threads, setThreads] = useState<Thread[]>([])
+  useEffect(() => {
+    async function fetchData() {
+      const querySnapshot = await getDocs(collection(db, 'threads'));
+      const threadsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Thread));
+      setThreads(threadsData);
 
-useEffect(() => {
-  async function fetchData() {
-    const querySnapshot = await getDocs(collection(db, 'threads'))
-    const threadsData = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Thread)) 
-    setThreads(threadsData)
-  }
-  fetchData()
-}, [])
-
+      // Fetch user details for each thread creator
+      const userPromises = threadsData.map(thread => getDoc(doc(db, 'users', thread.creator)));
+      const userDocs = await Promise.all(userPromises);
+      const usersData = userDocs.reduce((acc, userDoc) => {
+        if (userDoc.exists()) {
+          acc[userDoc.id] = userDoc.data() as User;
+        }
+        return acc;
+      }, {} as { [key: string]: User });
+      setUsers(usersData);
+    }
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -43,19 +53,21 @@ useEffect(() => {
       {threads.length > 0 ? (
         <ul>
           {threads.map(thread => (
-            <li key={thread.id} className='py-2'>
+            <li key={thread.id} className='bg-white shadow-md rounded-lg p-6 mb-6'>
               <div className='flex'>
                 <h2 className='font-semibold flex-1'>{thread.title}</h2>
                 <span className='bg-gray-700 text-white px-2 py-1 text-sm rounded-md'>{thread.category}</span>
               </div>
-              <p className='text-sm text-gray-500'>Posted by USERNAME at {new Intl.DateTimeFormat('sv-SE', {
+              <p className='text-sm text-gray-500'>
+                Posted by {users[thread.creator]?.firstName || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit',
                   second: '2-digit'
-                }).format(new Date(thread.creationDate))}</p>
+                }).format(new Date(thread.creationDate))}
+              </p>
             </li>
           ))}
         </ul>
@@ -63,7 +75,7 @@ useEffect(() => {
         <p>Loading...</p>
       )}
     </div>
-  )
+  );
 }
 
-export default ListThreads
+export default ListThreads;
