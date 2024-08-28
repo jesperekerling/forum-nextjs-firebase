@@ -45,7 +45,7 @@ function Header() {
   };
 
   return (
-    <header className='bg-white flex px-8'>
+    <header className='bg-white dark:bg-black flex px-8 bg-opacity-85 rounded-lg'>
         <span className='flex-none text-xl font-bold py-3 pr-10'><Link href="/">Forum</Link></span>
         <ul className='flex flex-1 gap-4 py-3'>
             <li><Link href="/">Home</Link></li>
