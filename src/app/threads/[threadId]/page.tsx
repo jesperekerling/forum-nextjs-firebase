@@ -125,7 +125,7 @@ const ThreadDetailPage: React.FC = () => {
               </div>
             ))
           ) : (
-            <p>No comments yet.</p>
+            <p className='pb-5'>No comments yet.</p>
           )}
         </div>
         <div>
