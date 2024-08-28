@@ -14,11 +14,11 @@ const Login = () => {
     const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setSuccess('User logged in successfully!');
+      console.log('User logged in successfully!');
       setError('');
-      router.push('/'); // This is correct
+     
     } catch (err) {
-      setError('Failed to log in user');
+      console.log('Failed to log in user');
       setSuccess('');
     }
   };
@@ -28,11 +28,12 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      setSuccess('User logged in successfully!');
+      console.log('User logged in successfully!');
+      
       setError('');
-      router.push('/'); // This is correct
+      
     } catch (err) {
-      setError('Failed to log in user');
+      console.log('Failed to log in user');
       setSuccess('');
     }
   };
