@@ -38,4 +38,4 @@ export async function testFirestore() {
     // Your Firestore test code here
 }
 
-export { auth }; // Export the auth object
+export { auth, db }; // Export the auth object

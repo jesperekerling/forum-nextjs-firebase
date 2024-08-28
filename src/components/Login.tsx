@@ -16,7 +16,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       setSuccess('User logged in successfully!');
       setError('');
-      router.push('/landingpage'); // This is correct
+      router.push('/'); // This is correct
     } catch (err) {
       setError('Failed to log in user');
       setSuccess('');
@@ -30,7 +30,7 @@ const Login = () => {
       await signInWithPopup(auth, provider);
       setSuccess('User logged in successfully!');
       setError('');
-      router.push('/landingpage'); // This is correct
+      router.push('/'); // This is correct
     } catch (err) {
       setError('Failed to log in user');
       setSuccess('');
