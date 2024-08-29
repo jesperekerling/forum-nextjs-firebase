@@ -56,7 +56,7 @@ function ListThreads() {
           {threads.map(thread => (
             <li key={thread.id} className='bg-white shadow-md rounded-lg p-6 mb-6'>
               <div className='flex'>
-                <h2 className='font-semibold flex-1'><Link href={`/threads/${thread.id}`}>{thread.title}</Link></h2>
+                <h2 className='font-semibold flex-1 dark:text-black'><Link href={`/threads/${thread.id}`}>{thread.title}</Link></h2>
                 <span className='bg-gray-700 text-white px-2 py-1 text-sm rounded-md'>{thread.category}</span>
               </div>
               <p className='text-sm text-gray-500'>
