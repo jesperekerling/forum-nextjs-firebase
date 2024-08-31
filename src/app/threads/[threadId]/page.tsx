@@ -99,6 +99,8 @@ const ThreadDetailPage: React.FC = () => {
     }
   };
 
+  const sortedComments = comments.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+
   return (
     <div>
       <Header />
@@ -116,8 +118,8 @@ const ThreadDetailPage: React.FC = () => {
         )}
         <div>
           <h2 className="text-xl font-bold mb-4">Comments</h2>
-          {comments.length > 0 ? (
-            comments.map(comment => (
+          {sortedComments.length > 0 ? (
+            sortedComments.map(comment => (
               <div key={comment.id} className="bg-gray-100 p-4 mb-4 rounded-lg">
                 <p className="text-gray-700">{comment.content}</p>
                 <p className="text-sm text-gray-500">By: {comment.creator}</p>
@@ -132,7 +134,7 @@ const ThreadDetailPage: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">Add a Comment</h2>
           <form onSubmit={handleCommentSubmit} className="bg-white shadow-md rounded-lg p-6 mb-6">
             <textarea
-              className="w-full p-2 mb-4 border rounded"
+              className="w-full p-2 mb-4 border rounded text-black"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Write your comment here..."
