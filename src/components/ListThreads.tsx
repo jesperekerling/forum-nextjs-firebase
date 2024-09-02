@@ -7,9 +7,7 @@ type ThreadCategory = "THREAD" | "QNA";
 
 type User = {
   id: string;
-  firstName: string;
   userName: string;
-  password: string;
 };
 
 type Thread = {
@@ -63,7 +61,7 @@ function ListThreads() {
                 <span className='bg-gray-700 text-white px-2 py-1 text-sm rounded-md'>{thread.category}</span>
               </div>
               <p className='text-sm text-gray-500'>
-                Posted by {users[thread.creator]?.firstName || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
+                Posted by {users[thread.creator]?.userName || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',

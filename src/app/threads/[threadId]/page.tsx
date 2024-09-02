@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { db } from '@/firebase';
 import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
 
 type ThreadCategory = "THREAD" | "QNA" | "hundar";
@@ -25,13 +26,25 @@ type Comment = {
   createdAt: Timestamp;
 };
 
+type User = {
+  id: string;
+  userName: string;
+};
+
 const ThreadDetailPage: React.FC = () => {
   const pathname = usePathname();
   const [thread, setThread] = useState<Thread | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
+  const [creatorName, setCreatorName] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+
     const threadId = pathname?.split('/').pop();
     if (threadId) {
       const fetchThread = async () => {
@@ -40,6 +53,15 @@ const ThreadDetailPage: React.FC = () => {
           if (threadDoc.exists()) {
             const threadData = threadDoc.data() as Thread;
             setThread(threadData);
+
+            // Fetch the creator's username
+            const userDoc = await getDoc(doc(db, 'users', threadData.creator));
+            if (userDoc.exists()) {
+              const userData = userDoc.data() as User;
+              setCreatorName(userData.userName);
+            } else {
+              console.log('No such user!');
+            }
           } else {
             console.log('No such thread!');
           }
@@ -82,7 +104,7 @@ const ThreadDetailPage: React.FC = () => {
         const newCommentData = {
           content: newComment,
           createdAt: serverTimestamp(),
-          creator: 'ZiWERIuvMNFzW8Jk3ExDG1VAZj2', // Replace with actual user ID
+          creator: 'ZiWERIuvMzW8Jk3ExDG1VAZj2', // Replace with actual user ID
           threadId: threadId
         };
         const docRef = await addDoc(collection(db, 'comments'), newCommentData);
@@ -110,7 +132,7 @@ const ThreadDetailPage: React.FC = () => {
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
             <p className="text-gray-700 mb-4">{thread.description}</p>
             <p className="text-sm text-gray-500">Category: {thread.category}</p>
-            <p className="text-sm text-gray-500">Created by: {thread.creator}</p>
+            <p className="text-sm text-gray-500">Created by: {creatorName}</p>
             <p className="text-sm text-gray-500">Creation Date: {new Date(thread.creationDate).toLocaleString()}</p>
           </div>
         ) : (
@@ -123,28 +145,26 @@ const ThreadDetailPage: React.FC = () => {
               <div key={comment.id} className="bg-gray-100 p-4 mb-4 rounded-lg">
                 <p className="text-gray-700">{comment.content}</p>
                 <p className="text-sm text-gray-500">By: {comment.creator}</p>
-                <p className="text-sm text-gray-500">At: {comment.createdAt.toDate().toLocaleString()}</p>
               </div>
             ))
           ) : (
-            <p className='pb-5'>No comments yet.</p>
+            <p>No comments yet.</p>
           )}
         </div>
-        <div>
-          <h2 className="text-xl font-bold mb-4">Add a Comment</h2>
-          <form onSubmit={handleCommentSubmit} className="bg-white shadow-md rounded-lg p-6 mb-6">
+        {isLoggedIn ? (
+          <form onSubmit={handleCommentSubmit} className="mt-4">
             <textarea
-              className="w-full p-2 mb-4 border rounded text-black"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write your comment here..."
-              rows={4}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Add a comment..."
+              required
             />
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-              Submit
-            </button>
+            <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded">Submit</button>
           </form>
-        </div>
+        ) : (
+          <p className="mt-4 text-red-500">You must be logged in to add a comment.</p>
+        )}
       </div>
     </div>
   );

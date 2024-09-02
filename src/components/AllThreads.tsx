@@ -1,9 +1,23 @@
-// src/components/AllThreadsPage.tsx
-import { db } from "@/firebase";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { Thread, User } from "../types/types";
+import { db } from '@/firebase';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+
+type ThreadCategory = "THREAD" | "QNA";
+
+type User = {
+  id: string;
+  userName: string;
+};
+
+type Thread = {
+  id: string;
+  title: string;
+  category: ThreadCategory;
+  creationDate: string;
+  description: string;
+  creator: string; // UID of the creator
+};
 
 function AllThreadsPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -28,6 +42,17 @@ function AllThreadsPage() {
       );
 
       setThreads(threadsData);
+
+      // Fetch user details for each thread creator
+      const userPromises = threadsData.map(thread => getDoc(doc(db, 'users', thread.creator)));
+      const userDocs = await Promise.all(userPromises);
+      const usersData = userDocs.reduce((acc, userDoc) => {
+        if (userDoc.exists()) {
+          acc[userDoc.id] = userDoc.data() as User;
+        }
+        return acc;
+      }, {} as { [key: string]: User });
+      setUsers(usersData);
     }
 
     fetchData();
@@ -53,7 +78,7 @@ function AllThreadsPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Posted by {users[thread.creator]?.firstName || "Unknown"} at{" "}
+                  Posted by {users[thread.creator]?.userName || "Unknown"} at{" "}
                   {new Intl.DateTimeFormat("sv-SE", {
                     year: "numeric",
                     month: "long",
