@@ -1,5 +1,5 @@
 import { db } from '@/firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -27,7 +27,10 @@ function ListThreads() {
 
   useEffect(() => {
     async function fetchData() {
-      const querySnapshot = await getDocs(collection(db, 'threads'));
+      // Query to get the latest 5 threads, ordered by creationDate descending
+      const q = query(collection(db, 'threads'), orderBy('creationDate', 'desc'), limit(5));
+      const querySnapshot = await getDocs(q);
+
       const threadsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
