@@ -149,7 +149,7 @@ const ThreadDetailPage: React.FC = () => {
         {thread ? (
           <div className="bg-white shadow-md rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
-            <p className="text-gray-700 mb-4">{thread.description}</p>
+            <p className="text-gray-700 mb-4" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500">Created by: {creatorName}</p>
             <p className="text-sm text-gray-500">Creation Date: {new Date(thread.creationDate).toLocaleString()}</p>
             <p className="text-sm text-gray-500">Category: {thread.category}</p>
@@ -174,7 +174,7 @@ const ThreadDetailPage: React.FC = () => {
           {sortedComments.length > 0 ? (
             sortedComments.map((comment) => (
               <div key={comment.id} className="bg-white shadow-md rounded-lg p-5 px-6 mb-6">
-                <p className="text-gray-800 pb-2">{comment.content}</p>
+                <p className="text-gray-800 pb-2" style={{ whiteSpace: 'pre-wrap' }}>{comment.content}</p>
                 <p className="text-sm text-gray-500 font-semibold pb-2">{usernames[comment.creator] || 'Unknown'}</p>
                 <p className="text-gray-500 text-xs">{comment.createdAt.toDate().toLocaleString()}</p>
               </div>
