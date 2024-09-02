@@ -6,30 +6,9 @@ import { db } from '@/firebase';
 import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
+import { Thread, User, Comment } from '@/types/types';
 
-type ThreadCategory = "THREAD" | "QNA" | "hundar";
 
-type Thread = {
-  id: string;
-  title: string;
-  category: ThreadCategory;
-  creationDate: string;
-  description: string;
-  creator: string;
-};
-
-type Comment = {
-  id: string;
-  threadId: string;
-  content: string;
-  creator: string;
-  createdAt: Timestamp;
-};
-
-type User = {
-  id: string;
-  userName: string;
-};
 
 const ThreadDetailPage: React.FC = () => {
   const pathname = usePathname();

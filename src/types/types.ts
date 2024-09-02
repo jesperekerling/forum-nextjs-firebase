@@ -1,11 +1,11 @@
-export type ThreadCategory = "THREAD" | "QNA";
+import { Timestamp } from "firebase/firestore";
 
-export type User = {
+export type Comment = {
   id: string;
-  firstName: string;
-  userName: string;
-  password: string;
-  userUID: string;
+  threadId: string;
+  content: string;
+  creator: string;
+  createdAt: Timestamp;
 };
 
 export type Thread = {
@@ -15,4 +15,14 @@ export type Thread = {
   creationDate: string;
   description: string;
   creator: string; // UID of the creator
+};
+
+export type ThreadCategory = "THREAD" | "QNA";
+
+export type User = {
+  id: string;
+  firstName: string;
+  userName: string;
+  password: string;
+  userUID: string;
 };

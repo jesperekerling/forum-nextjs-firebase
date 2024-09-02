@@ -2,22 +2,9 @@ import { db } from '@/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { Thread, User } from '@/types/types';
 
 type ThreadCategory = "THREAD" | "QNA";
-
-type User = {
-  id: string;
-  userName: string;
-};
-
-type Thread = {
-  id: string;
-  title: string;
-  category: ThreadCategory;
-  creationDate: string;
-  description: string;
-  creator: string; // UID of the creator
-};
 
 function AllThreadsPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
