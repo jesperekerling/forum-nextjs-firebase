@@ -180,19 +180,8 @@ const ThreadDetailPage: React.FC = () => {
         )}
         <div>
           <h2 className="text-xl font-bold mb-4">Comments</h2>
-          {sortedComments.length > 0 ? (
-            sortedComments.map((comment) => (
-              <div key={comment.id} className="bg-gray-100 p-4 mb-4 rounded-lg">
-                <p className="text-gray-700">{comment.content}</p>
-                <p className="text-sm text-gray-500">By: {usernames[comment.creator] || 'Unknown'}</p>
-              </div>
-            ))
-          ) : (
-            <p>No comments yet.</p>
-          )}
-        </div>
-        {isLoggedIn && (
-          <form onSubmit={handleCommentSubmit} className="mt-4">
+          {isLoggedIn && (
+          <form onSubmit={handleCommentSubmit} className="my-4">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -200,9 +189,22 @@ const ThreadDetailPage: React.FC = () => {
               placeholder="Add a comment..."
               required
             />
-            <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded">Submit</button>
+            <button type="submit" className="mt-2 bg-blue-500 text-white p-2 px-4 rounded hover:opacity-65">Submit</button>
           </form>
         )}
+          {sortedComments.length > 0 ? (
+            sortedComments.map((comment) => (
+              <div key={comment.id} className="bg-white shadow-md rounded-lg p-5 px-6 mb-6">
+                <p className="text-gray-800 pb-2">{comment.content}</p>
+                <p className="text-sm text-gray-500 font-semibold pb-2">{usernames[comment.creator] || 'Unknown'}</p>
+                <p className="text-gray-500 text-xs">{comment.createdAt.toDate().toLocaleString()}</p>
+              </div>
+            ))
+          ) : (
+            <p>No comments yet.</p>
+          )}
+        </div>
+
       </div>
     </div>
   );
