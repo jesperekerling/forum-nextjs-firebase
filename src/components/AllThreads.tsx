@@ -71,7 +71,7 @@ function AllThreadsPage() {
               <Link href={`/threads/${thread.id}`}>
                 <div className="flex">
                   <h2 className="font-semibold flex-1 dark:text-black">
-                    <Link href={`/threads/${thread.id}`}>{thread.title}</Link>
+                    {thread.title}
                   </h2>
                   <span className="bg-gray-700 text-white px-2 py-1 text-sm rounded-md">
                     {thread.category}
