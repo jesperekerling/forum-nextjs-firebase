@@ -196,7 +196,7 @@ const ThreadDetailPage: React.FC = () => {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded text-black bg-white dark:text-white dark:bg-black"
               placeholder="Add a comment..."
               required
             />
