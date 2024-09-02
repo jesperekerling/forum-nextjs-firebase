@@ -171,9 +171,9 @@ const ThreadDetailPage: React.FC = () => {
           <div className="bg-white shadow-md rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
             <p className="text-gray-700 mb-4">{thread.description}</p>
-            <p className="text-sm text-gray-500">Category: {thread.category}</p>
             <p className="text-sm text-gray-500">Created by: {creatorName}</p>
             <p className="text-sm text-gray-500">Creation Date: {new Date(thread.creationDate).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">Category: {thread.category}</p>
           </div>
         ) : (
           <p>Loading thread...</p>
