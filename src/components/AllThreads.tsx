@@ -66,7 +66,7 @@ function AllThreadsPage() {
           {threads.map((thread) => (
             <li
               key={thread.id}
-              className="bg-white shadow-md rounded-lg p-6 mb-6"
+              className="bg-white shadow-md rounded-lg p-6 mb-6 hover:opacity-65"
             >
               <Link href={`/threads/${thread.id}`}>
                 <div className="flex">

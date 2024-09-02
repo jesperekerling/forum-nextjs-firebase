@@ -5,6 +5,7 @@ export type User = {
   firstName: string;
   userName: string;
   password: string;
+  userUID: string;
 };
 
 export type Thread = {

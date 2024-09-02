@@ -38,11 +38,26 @@ const ThreadDetailPage: React.FC = () => {
   const [newComment, setNewComment] = useState<string>('');
   const [creatorName, setCreatorName] = useState<string>('');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [usernames, setUsernames] = useState<{ [key: string]: string }>({});
+  const [currentUserUID, setCurrentUserUID] = useState<string | null>(null);
+  const [currentUserName, setCurrentUserName] = useState<string>('');
 
   useEffect(() => {
     const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setCurrentUserUID(user.uid);
+
+        // Fetch the current user's username
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data() as User;
+          setCurrentUserName(userData.userName);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
     });
 
     const threadId = pathname?.split('/').pop();
@@ -86,6 +101,19 @@ const ThreadDetailPage: React.FC = () => {
             };
           }) as Comment[];
           setComments(commentsData);
+
+          // Fetch usernames for each comment creator
+          const usernamesMap: { [key: string]: string } = {};
+          await Promise.all(commentsData.map(async (comment) => {
+            if (!usernamesMap[comment.creator]) {
+              const userDoc = await getDoc(doc(db, 'users', comment.creator));
+              if (userDoc.exists()) {
+                const userData = userDoc.data() as User;
+                usernamesMap[comment.creator] = userData.userName;
+              }
+            }
+          }));
+          setUsernames(usernamesMap);
         } catch (error) {
           console.error('Error fetching comments:', error);
         }
@@ -99,12 +127,12 @@ const ThreadDetailPage: React.FC = () => {
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const threadId = pathname?.split('/').pop();
-    if (threadId && newComment.trim()) {
+    if (threadId && newComment.trim() && currentUserUID) {
       try {
         const newCommentData = {
           content: newComment,
           createdAt: serverTimestamp(),
-          creator: 'ZiWERIuvMzW8Jk3ExDG1VAZj2', // Replace with actual user ID
+          creator: currentUserUID,
           threadId: threadId
         };
         const docRef = await addDoc(collection(db, 'comments'), newCommentData);
@@ -115,6 +143,18 @@ const ThreadDetailPage: React.FC = () => {
         } as Comment;
         setComments([...comments, addedComment]);
         setNewComment('');
+
+        // Fetch the username for the new comment creator
+        if (!usernames[currentUserUID]) {
+          const userDoc = await getDoc(doc(db, 'users', currentUserUID));
+          if (userDoc.exists()) {
+            const userData = userDoc.data() as User;
+            setUsernames((prevUsernames) => ({
+              ...prevUsernames,
+              [currentUserUID]: userData.userName
+            }));
+          }
+        }
       } catch (error) {
         console.error('Error adding comment:', error);
       }
@@ -141,17 +181,17 @@ const ThreadDetailPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold mb-4">Comments</h2>
           {sortedComments.length > 0 ? (
-            sortedComments.map(comment => (
+            sortedComments.map((comment) => (
               <div key={comment.id} className="bg-gray-100 p-4 mb-4 rounded-lg">
                 <p className="text-gray-700">{comment.content}</p>
-                <p className="text-sm text-gray-500">By: {comment.creator}</p>
+                <p className="text-sm text-gray-500">By: {usernames[comment.creator] || 'Unknown'}</p>
               </div>
             ))
           ) : (
             <p>No comments yet.</p>
           )}
         </div>
-        {isLoggedIn ? (
+        {isLoggedIn && (
           <form onSubmit={handleCommentSubmit} className="mt-4">
             <textarea
               value={newComment}
@@ -162,8 +202,6 @@ const ThreadDetailPage: React.FC = () => {
             />
             <button type="submit" className="mt-2 bg-blue-500 text-white p-2 rounded">Submit</button>
           </form>
-        ) : (
-          <p className="mt-4 text-red-500">You must be logged in to add a comment.</p>
         )}
       </div>
     </div>
