@@ -8,6 +8,8 @@ export type Comment = {
   createdAt: Timestamp;
 };
 
+export type ThreadCategory = "THREAD" | "QNA";
+
 export type Thread = {
   id: string;
   title: string;
@@ -16,8 +18,6 @@ export type Thread = {
   description: string;
   creator: string; // UID of the creator
 };
-
-export type ThreadCategory = "THREAD" | "QNA";
 
 export type User = {
   id: string;
