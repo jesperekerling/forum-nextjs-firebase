@@ -41,7 +41,7 @@ function ListThreads() {
 
   return (
     <div>
-      <h2 className='font-bold text-xl pb-3'>Latest Threads</h2>
+      <h2 className='font-bold text-xl pb-3'>Latest Threads!</h2>
       {threads.length > 0 ? (
         <ul>
           {threads.map(thread => (
