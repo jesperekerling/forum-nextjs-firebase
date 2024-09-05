@@ -56,7 +56,7 @@ const Page = () => {
       <Header />
       <div className="p-10">
         
-        <h1 className="text-2xl font-bold pb-10 text-center">Forum</h1>
+        <h1 className="text-2xl font-bold pb-10 text-center">Forum2</h1>
         
         <div className="pt-2 mx-auto text-right">
           <a href="/create-thread" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">Create Thread</a>
