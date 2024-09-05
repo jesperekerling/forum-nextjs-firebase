@@ -8,8 +8,6 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
 import { Thread, User, Comment } from '@/types/types';
 
-
-
 const ThreadDetailPage: React.FC = () => {
   const pathname = usePathname();
   const [thread, setThread] = useState<Thread | null>(null);
@@ -151,7 +149,20 @@ const ThreadDetailPage: React.FC = () => {
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
             <p className="text-gray-700 mb-4" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500">Created by: {creatorName}</p>
-            <p className="text-sm text-gray-500">Creation Date: {new Date(thread.creationDate).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">
+              Creation Date: {new Intl.DateTimeFormat('sv-SE', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              }).format(
+                thread.creationDate instanceof Timestamp
+                  ? thread.creationDate.toDate()
+                  : new Date(thread.creationDate)
+              )}
+            </p>
             <p className="text-sm text-gray-500">Category: {thread.category}</p>
           </div>
         ) : (
@@ -160,17 +171,17 @@ const ThreadDetailPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold mb-4">Comments</h2>
           {isLoggedIn && (
-          <form onSubmit={handleCommentSubmit} className="my-4">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-black bg-white dark:text-white dark:bg-black"
-              placeholder="Add a comment..."
-              required
-            />
-            <button type="submit" className="mt-2 bg-blue-500 text-white p-2 px-4 rounded hover:opacity-65">Submit</button>
-          </form>
-        )}
+            <form onSubmit={handleCommentSubmit} className="my-4">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded text-black bg-white dark:text-white dark:bg-black"
+                placeholder="Add a comment..."
+                required
+              />
+              <button type="submit" className="mt-2 bg-blue-500 text-white p-2 px-4 rounded hover:opacity-65">Submit</button>
+            </form>
+          )}
           {sortedComments.length > 0 ? (
             sortedComments.map((comment) => (
               <div key={comment.id} className="bg-white shadow-md rounded-lg p-5 px-6 mb-6">
@@ -183,7 +194,6 @@ const ThreadDetailPage: React.FC = () => {
             <p>No comments yet.</p>
           )}
         </div>
-
       </div>
     </div>
   );
