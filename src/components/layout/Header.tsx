@@ -2,12 +2,13 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { auth, db } from '@/firebase'; // Ensure you have these exports in your firebase.js
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebase';
 
 function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -16,11 +17,13 @@ function Header() {
       if (user) {
         setIsLoggedIn(true);
         try {
-          const db = getFirestore();
-          const querySnapshot = await getDocs(collection(db, 'your-collection-name'));
-          querySnapshot.forEach((doc) => {
-            console.log(`${doc.id} => ${doc.data()}`);
-          });
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUsername(userData.userName);
+          } else {
+            console.log('No such user!');
+          }
         } catch (err) {
           console.error('Error accessing Firestore: ', err);
           setError('Failed to access Firestore');
@@ -52,7 +55,8 @@ function Header() {
             <li><Link href="/threads">Threads</Link></li>
             {isLoggedIn ? (
             <>
-                <li className='flex-1 text-right'><button onClick={handleLogout}>Logout</button></li>
+                <li className='flex-1 text-right pr-5'>{username}</li>
+                <li className='text-right'><button onClick={handleLogout}>Logout</button></li>
                 {error && <li className="text-red-500">{error}</li>}
             </>
             ) : (

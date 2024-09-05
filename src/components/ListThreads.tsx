@@ -3,6 +3,7 @@ import { Thread, User } from '@/types/types';
 import { collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { Timestamp } from 'firebase/firestore';
 
 
 type ThreadCategory = "THREAD" | "QNA";
@@ -62,7 +63,11 @@ function ListThreads() {
                     hour: '2-digit',
                     minute: '2-digit',
                     second: '2-digit'
-                  }).format(new Date(thread.creationDate))}
+                  }).format(
+                    thread.creationDate instanceof Timestamp
+                      ? thread.creationDate.toDate()
+                      : new Date(thread.creationDate)
+                  )}
                 </p>
                 </div>
               </Link>

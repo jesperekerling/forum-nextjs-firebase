@@ -14,7 +14,7 @@ export type Thread = {
   id: string;
   title: string;
   category: ThreadCategory;
-  creationDate: string;
+  creationDate: Timestamp;
   description: string;
   creator: string; // UID of the creator
 };
