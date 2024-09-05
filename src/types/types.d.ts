@@ -11,6 +11,7 @@ export type Comment = {
 export type ThreadCategory = "THREAD" | "QNA";
 
 export type Thread = {
+  updatedAt: Timestamp;
   id: string;
   title: string;
   category: ThreadCategory;

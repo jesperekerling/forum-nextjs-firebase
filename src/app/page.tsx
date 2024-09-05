@@ -54,7 +54,7 @@ const Page = () => {
 
     <main className="container mx-auto">
       <Header />
-      <div className="p-10">
+      <div className="p-1">
         
         <h1 className="text-2xl font-bold pb-10 text-center">Forum</h1>
         

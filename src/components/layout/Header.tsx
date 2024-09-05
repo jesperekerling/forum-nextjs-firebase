@@ -48,20 +48,23 @@ function Header() {
   };
 
   return (
-    <header className='bg-white dark:bg-black flex px-8 bg-opacity-85 rounded-lg'>
+    <header className='bg-white dark:bg-black flex px-8 bg-opacity-85 rounded-lg mb-10'>
         <span className='flex-none text-xl font-bold py-3 pr-10'><Link href="/">Forum</Link></span>
         <ul className='flex flex-1 gap-4 py-3'>
-            <li><Link href="/">Home</Link></li>
             <li><Link href="/threads">Threads</Link></li>
+            <li><Link href="/comments">Comments</Link></li>
             {isLoggedIn ? (
             <>
-                <li className='flex-1 text-right pr-5'>{username}</li>
-                <li className='text-right'><button onClick={handleLogout}>Logout</button></li>
+                <li className='flex-1 text-right pr-5 hidden md:inline-block'>
+                  <span className='text-gray-600 dark:text-gray-200 text-xs pr-2'>Logged in as: </span> 
+                  {username}
+                </li>
+                <li className='flex-1 md:flex-none text-right'><button onClick={handleLogout}>Logout</button></li>
                 {error && <li className="text-red-500">{error}</li>}
             </>
             ) : (
             <>
-                <li className='flex-1 text-right'><Link href="/login">Log in</Link></li>
+                <li className='sm:flex-1 text-right'><Link href="/login">Log in</Link></li>
                 <li className='text-right'><Link href="/register">Register</Link></li>
             </>
             )}

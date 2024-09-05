@@ -48,7 +48,8 @@ function AllThreadsPage() {
 
   return (
     <div>
-      <h2 className="font-bold text-xl pb-3">All Threads</h2>
+      <h2 className="font-bold text-xl pb-3">Latest Threads</h2>
+      <p className='pb-7 text-sm text-gray-700 dark:text-gray-300'>Displaying the latest new threads of the forum.</p>
       {threads.length > 0 ? (
         <ul>
           {threads.map((thread) => (

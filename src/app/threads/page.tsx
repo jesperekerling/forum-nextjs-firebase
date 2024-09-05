@@ -6,9 +6,9 @@ import AllThreads from "@/components/AllThreads";
 const AllThreadsPage = () => {
   return (
     <main className="container mx-auto">
-      <div className="mb-20">
-        <Header />
-      </div>
+      
+      <Header />
+      
       <AllThreads />
       <div className="p-5">
         <div className="pt-10 mx-auto text-center">

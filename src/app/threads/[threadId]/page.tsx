@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { db } from '@/firebase';
-import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
 import { Thread, User, Comment } from '@/types/types';
+import Link from 'next/link';
 
 const ThreadDetailPage: React.FC = () => {
   const pathname = usePathname();
@@ -132,6 +133,12 @@ const ThreadDetailPage: React.FC = () => {
             }));
           }
         }
+
+        // Update the thread's updatedAt timestamp
+        await setDoc(doc(db, 'threads', threadId), {
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
       } catch (error) {
         console.error('Error adding comment:', error);
       }
@@ -141,11 +148,11 @@ const ThreadDetailPage: React.FC = () => {
   const sortedComments = comments.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
 
   return (
-    <div>
+    <div className='mx-auto container'>
       <Header />
       <div className="container mx-auto p-4">
         {thread ? (
-          <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <div className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
             <p className="text-gray-700 mb-4" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500">Created by: {creatorName}</p>
@@ -169,30 +176,48 @@ const ThreadDetailPage: React.FC = () => {
           <p>Loading thread...</p>
         )}
         <div>
-          <h2 className="text-xl font-bold mb-4">Comments</h2>
           {isLoggedIn && (
-            <form onSubmit={handleCommentSubmit} className="my-4">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded text-black bg-white dark:text-white dark:bg-black"
-                placeholder="Add a comment..."
-                required
-              />
-              <button type="submit" className="mt-2 bg-blue-500 text-white p-2 px-4 rounded hover:opacity-65">Submit</button>
-            </form>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Write Comment</h2>
+              <form onSubmit={handleCommentSubmit} className="my-4">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded text-black bg-white dark:text-white dark:bg-black"
+                  placeholder="Add a comment..."
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Submit
+                </button>
+              </form>
+            </div>
           )}
-          {sortedComments.length > 0 ? (
-            sortedComments.map((comment) => (
-              <div key={comment.id} className="bg-white shadow-md rounded-lg p-5 px-6 mb-6">
-                <p className="text-gray-800 pb-2" style={{ whiteSpace: 'pre-wrap' }}>{comment.content}</p>
-                <p className="text-sm text-gray-500 font-semibold pb-2">{usernames[comment.creator] || 'Unknown'}</p>
-                <p className="text-gray-500 text-xs">{comment.createdAt.toDate().toLocaleString()}</p>
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Comments</h2>
+            {sortedComments.map((comment) => (
+              <div key={comment.id} className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-4 mb-4">
+                <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
+                <p className="text-sm text-gray-500">
+                  Posted by {usernames[comment.creator] || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  }).format(
+                    comment.createdAt instanceof Timestamp
+                      ? comment.createdAt.toDate()
+                      : new Date(comment.createdAt)
+                  )}
+                </p>
               </div>
-            ))
-          ) : (
-            <p>No comments yet.</p>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>
