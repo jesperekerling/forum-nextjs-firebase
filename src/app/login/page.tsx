@@ -8,7 +8,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { auth } from "@/firebase"; // Import the initialized auth
+import { auth, db } from "@/firebase"; // Import the initialized auth and db
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Header from "@/components/layout/Header";
 
 const Login = () => {
@@ -31,8 +32,28 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      router.push("/");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+  
+      if (!userDoc.exists()) {
+        // If user document does not exist, create it with the display name
+        await setDoc(doc(db, "users", user.uid), {
+          userName: "",
+          email: user.email,
+          UserUID: user.uid
+        });
+        // Redirect to username form
+        router.push("/set-username");
+      } else {
+        // User exists, check if userName is set
+        const userData = userDoc.data();
+        if (!userData?.userName) {
+          router.push("/set-username");
+        } else {
+          router.push("/");
+        }
+      }
     } catch (error) {
       console.error("Error logging in with Google: ", error);
       setError("Failed to log in with Google");

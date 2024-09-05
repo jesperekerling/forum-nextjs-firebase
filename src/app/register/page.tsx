@@ -19,17 +19,15 @@ function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
       // Store the username in Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        userName: username,
+        userName: "",
         email: user.email,
         UserUID: user.uid
       });
-
       setSuccess("User registered successfully!");
       setError("");
-      router.push("/"); // Redirect to home page or another page
+      router.push("/set-username"); // Redirect to set-username page
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {
         setError("User already exists.");
@@ -45,18 +43,16 @@ function RegisterPage() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-
       // Store the username in Firestore if it doesn't already exist
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         await setDoc(doc(db, 'users', user.uid), {
-          userName: user.displayName || 'Anonymous',
+          userName: "",
           email: user.email,
           UserUID: user.uid
         });
       }
-
-      router.push("/");
+      router.push("/set-username");
     } catch (error) {
       console.error("Error logging in with Google: ", error);
       setError("Failed to log in with Google");
