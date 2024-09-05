@@ -18,7 +18,7 @@ const ThreadDetailPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [usernames, setUsernames] = useState<{ [key: string]: string }>({});
   const [currentUserUID, setCurrentUserUID] = useState<string | null>(null);
-  const [currentUserName, setCurrentUserName] = useState<string>('');
+  const [isModerator, setIsModerator] = useState<boolean>(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -27,11 +27,11 @@ const ThreadDetailPage: React.FC = () => {
         setIsLoggedIn(true);
         setCurrentUserUID(user.uid);
 
-        // Fetch the current user's username
+        // Fetch the current user's username and moderator status
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data() as User;
-          setCurrentUserName(userData.userName);
+          setIsModerator(userData.isModerator);
         }
       } else {
         setIsLoggedIn(false);
@@ -171,6 +171,35 @@ const ThreadDetailPage: React.FC = () => {
               )}
             </p>
             <p className="text-sm text-gray-500">Category: {thread.category}</p>
+
+            {isModerator && (
+              <div className='moderator'>
+                Moderator stuff:<br />
+                <ul>
+                  <li>
+                    <Link href={`/threads/${thread.id}/edit`}>
+                      <span className='text-blue-500 hover:underline'>
+                        Edit
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/threads/${thread.id}/close`}>
+                      <span className='text-blue-500 hover:underline'>
+                        Close Thread
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/threads/${thread.id}/delete`}>
+                      <span className='text-blue-500 hover:underline'>
+                        Delete
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         ) : (
           <p>Loading thread...</p>

@@ -8,7 +8,7 @@ export type Comment = {
   createdAt: Timestamp;
 };
 
-export type ThreadCategory = "THREAD" | "QNA";
+export type ThreadCategory = "THREAD" | "QNA" | "AD";
 
 export type Thread = {
   updatedAt: Timestamp;
@@ -26,4 +26,5 @@ export type User = {
   userName: string;
   password: string;
   userUID: string;
+  isModerator: boolean;
 };
