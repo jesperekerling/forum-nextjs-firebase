@@ -46,7 +46,7 @@ const ThreadDetailPage: React.FC = () => {
           const threadDoc = await getDoc(doc(db, 'threads', threadId));
           if (threadDoc.exists()) {
             const threadData = threadDoc.data() as Thread;
-            setThread(threadData);
+            setThread({ ...threadData, id: threadDoc.id });
             setIsLocked(threadData.isLocked);
 
             // Fetch the creator's username
