@@ -164,6 +164,70 @@ const ThreadDetailPage: React.FC = () => {
     }
   };
 
+  const handleMarkAsCorrect = async (commentId: string) => {
+    const threadId = pathname?.split('/').pop();
+    if (threadId) {
+      try {
+        const threadRef = doc(db, 'threads', threadId);
+        const commentRef = doc(db, 'comments', commentId);
+
+        // Update the thread to store the correct answer ID
+        await updateDoc(threadRef, {
+          correctAnswerId: commentId
+        });
+
+        // Update the comment to mark it as the correct answer
+        await updateDoc(commentRef, {
+          isCorrectAnswer: true
+        });
+
+        // Update the local state
+        setThread((prevThread) => prevThread ? { ...prevThread, correctAnswerId: commentId } : prevThread);
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === commentId ? { ...comment, isCorrectAnswer: true } : comment
+          )
+        );
+      } catch (error) {
+        console.error('Error marking comment as correct answer:', error);
+      }
+    } else {
+      console.error('Thread ID is undefined');
+    }
+  };
+
+  const handleUnmarkAsCorrect = async (commentId: string) => {
+    const threadId = pathname?.split('/').pop();
+    if (threadId) {
+      try {
+        const threadRef = doc(db, 'threads', threadId);
+        const commentRef = doc(db, 'comments', commentId);
+
+        // Update the thread to remove the correct answer ID
+        await updateDoc(threadRef, {
+          correctAnswerId: ''
+        });
+
+        // Update the comment to unmark it as the correct answer
+        await updateDoc(commentRef, {
+          isCorrectAnswer: false
+        });
+
+        // Update the local state
+        setThread((prevThread) => prevThread ? { ...prevThread, correctAnswerId: '' } : prevThread);
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === commentId ? { ...comment, isCorrectAnswer: false } : comment
+          )
+        );
+      } catch (error) {
+        console.error('Error unmarking comment as correct answer:', error);
+      }
+    } else {
+      console.error('Thread ID is undefined');
+    }
+  };
+
   const sortedComments = comments.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
 
   return (
@@ -190,6 +254,9 @@ const ThreadDetailPage: React.FC = () => {
               )}
             </p>
             <p className="text-sm text-gray-500">Category: {thread.category}</p>
+            {thread.tags && thread.tags.length > 0 && (
+              <p className="text-sm text-gray-500">Tags: {thread.tags.join(', ')}</p>
+            )}
 
             {isModerator && (
               <div className='moderator'>
@@ -248,7 +315,7 @@ const ThreadDetailPage: React.FC = () => {
           <div>
             <h2 className="text-2xl font-bold mb-4">Comments</h2>
             {sortedComments.map((comment) => (
-              <div key={comment.id} className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-4 mb-4">
+              <div key={comment.id} className={`bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-4 mb-4 ${comment.isCorrectAnswer ? 'bg-lightblue-100' : ''}`}>
                 <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
                 <p className="text-sm text-gray-500">
                   Posted by {usernames[comment.creator] || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
@@ -264,6 +331,28 @@ const ThreadDetailPage: React.FC = () => {
                       : new Date(comment.createdAt)
                   )}
                 </p>
+                {comment.isCorrectAnswer && (
+                  <p className="text-sm text-blue-500 font-bold">Best answer yet, selected by Moderator</p>
+                )}
+                {isModerator && thread?.category === 'QNA' && (
+                  <>
+                    {!comment.isCorrectAnswer ? (
+                      <button
+                        onClick={() => handleMarkAsCorrect(comment.id)}
+                        className="text-blue-500 hover:underline mt-2"
+                      >
+                        Mark as Correct Answer
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleUnmarkAsCorrect(comment.id)}
+                        className="text-red-500 hover:underline mt-2"
+                      >
+                        Unmark as Correct Answer
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             ))}
           </div>

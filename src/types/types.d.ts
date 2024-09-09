@@ -6,6 +6,7 @@ export type Comment = {
   content: string;
   creator: string;
   createdAt: Timestamp;
+  isCorrectAnswer: boolean;
 };
 
 export type ThreadCategory = "THREAD" | "QNA" | "AD";
@@ -19,6 +20,8 @@ export type Thread = {
   description: string;
   creator: string; // UID of the creator
   isLocked: boolean;
+  tags: string[];
+  correctAnswerId?: string;
 };
 
 export type User = {

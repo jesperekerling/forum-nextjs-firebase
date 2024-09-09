@@ -3,47 +3,75 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
+import { User } from '@/types/types';
 
 function CreateThreadPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [creator, setCreator] = useState('');
+  const [category, setCategory] = useState('THREAD');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setCreator(user.uid);
+        setIsLoggedIn(true);
+
+        // Fetch the current user's moderator status
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data() as User;
+          setIsModerator(userData.isModerator);
+        }
       } else {
-        console.log('User is not logged in');
+        setIsLoggedIn(false);
       }
     });
-    return () => unsubscribe();
   }, []);
+
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagInput(e.target.value);
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+        setTagInput('');
+      }
+    }
+  };
+
+  const handleTagDelete = (tagToDelete: string) => {
+    setTags(tags.filter(tag => tag !== tagToDelete));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newThread = {
-      title,
-      description,
-      category,
-      creator,
-      creationDate: new Date().toISOString(),
-    };
+    if (!title.trim() || !description.trim()) return;
+
     try {
-      await addDoc(collection(db, 'threads'), newThread);
-      console.log('Document successfully written!');
-      setTitle('');
-      setDescription('');
-      setCategory('');
-      router.push('/threads'); // Redirect to /threads after creating a new thread
+      await addDoc(collection(db, 'threads'), {
+        title,
+        description,
+        category,
+        tags,
+        creator: getAuth().currentUser?.uid,
+        creationDate: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        isLocked: false,
+      });
+      router.push('/threads');
     } catch (error) {
-      console.error('Error writing document: ', error);
+      console.error('Error creating thread:', error);
     }
   };
 
@@ -51,12 +79,9 @@ function CreateThreadPage() {
     <div className='mx-auto container'>
       <Header />
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Create a New Thread</h1>
-        {/* {!creator && (
-          <p className="text-red-500 mb-4">You need to log in to create a New Thread</p>
-        )} */}
-        {creator ? (
-          <form onSubmit={handleSubmit}>
+        <h1 className="text-2xl font-bold mb-4">Create New Thread</h1>
+        {isLoggedIn ? (
+          <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
                 Title
@@ -86,18 +111,49 @@ function CreateThreadPage() {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
                 Category
               </label>
-              <input
+              <select
                 id="category"
-                type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 required
+              >
+                <option value="THREAD">Thread</option>
+                <option value="QNA">QNA</option>
+                {isModerator && <option value="AD">AD</option>}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="tags">
+                Tags
+              </label>
+              <input
+                id="tags"
+                type="text"
+                value={tagInput}
+                onChange={handleTagInputChange}
+                onKeyDown={handleTagInputKeyDown}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Add tags separated by commas"
               />
+              <div className="mt-2">
+                {tags.map((tag, index) => (
+                  <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                    {tag}
+                    <button
+                      type="button"
+                      className="ml-2 text-red-500"
+                      onClick={() => handleTagDelete(tag)}
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-black hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Create Thread
             </button>
