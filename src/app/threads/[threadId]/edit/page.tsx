@@ -1,0 +1,213 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { db } from '@/firebase';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import Header from '@/components/layout/Header';
+import { Thread, User } from '@/types/types';
+
+const EditThreadPage: React.FC = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [thread, setThread] = useState<Thread | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('THREAD');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [currentUserUID, setCurrentUserUID] = useState<string | null>(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log('User is logged in:', user.uid);
+        setIsLoggedIn(true);
+        setCurrentUserUID(user.uid);
+
+        // Fetch the current user's moderator status
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data() as User;
+          console.log('User data:', userData);
+          setIsModerator(userData.isModerator);
+        }
+      } else {
+        console.log('User is not logged in');
+        setIsLoggedIn(false);
+      }
+    });
+
+    const threadIdMatch = pathname?.match(/\/threads\/([^\/]+)\/edit/);
+    const threadId = threadIdMatch ? threadIdMatch[1] : null;
+    console.log('Thread ID:', threadId);
+    if (threadId) {
+      const fetchThread = async () => {
+        try {
+          const threadDocRef = doc(db, 'threads', threadId);
+          console.log('Fetching thread with ref:', threadDocRef.path);
+          const threadDoc = await getDoc(threadDocRef);
+          if (threadDoc.exists()) {
+            const threadData = threadDoc.data() as Thread;
+            console.log('Thread data:', threadData);
+            setThread(threadData);
+            setTitle(threadData.title);
+            setDescription(threadData.description);
+            setCategory(threadData.category);
+            setTags(threadData.tags || []);
+          } else {
+            console.log('No such thread!');
+          }
+        } catch (error) {
+          console.error('Error fetching thread:', error);
+        }
+      };
+
+      fetchThread();
+    }
+  }, [pathname]);
+
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagInput(e.target.value);
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+        setTagInput('');
+      }
+    }
+  };
+
+  const handleTagDelete = (tagToDelete: string) => {
+    setTags(tags.filter(tag => tag !== tagToDelete));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const threadIdMatch = pathname?.match(/\/threads\/([^\/]+)\/edit/);
+    const threadId = threadIdMatch ? threadIdMatch[1] : null;
+    if (threadId && thread) {
+      try {
+        const updatedData = {
+          title,
+          description,
+          category,
+          tags,
+          updatedAt: serverTimestamp(),
+        };
+        console.log('Updating thread with data:', updatedData);
+        await updateDoc(doc(db, 'threads', threadId), updatedData);
+        router.push(`/threads/${threadId}`);
+      } catch (error) {
+        console.error('Error updating thread:', error);
+      }
+    }
+  };
+
+  if (!isLoggedIn) {
+    return <p>You need to be logged in to edit this thread.</p>;
+  }
+
+  if (!isModerator && thread?.creator !== currentUserUID) {
+    return <p>You do not have permission to edit this thread.</p>;
+  }
+
+  return (
+    <div className='mx-auto container'>
+      <Header />
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">Edit Thread</h1>
+        {thread ? (
+          <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+                Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+                Category
+              </label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              >
+                <option value="THREAD">Thread</option>
+                <option value="QNA">QNA</option>
+                {isModerator && <option value="AD">AD</option>}
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="tags">
+                Tags
+              </label>
+              <input
+                id="tags"
+                type="text"
+                value={tagInput}
+                onChange={handleTagInputChange}
+                onKeyDown={handleTagInputKeyDown}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Add tags separated by commas"
+              />
+              <div className="mt-2">
+                {tags.map((tag, index) => (
+                  <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                    {tag}
+                    <button
+                      type="button"
+                      className="ml-2 text-red-500"
+                      onClick={() => handleTagDelete(tag)}
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Update Thread
+            </button>
+          </form>
+        ) : (
+          <p>Loading thread...</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default EditThreadPage;

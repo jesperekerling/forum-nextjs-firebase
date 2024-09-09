@@ -258,7 +258,7 @@ const ThreadDetailPage: React.FC = () => {
               <p className="text-sm text-gray-500">Tags: {thread.tags.join(', ')}</p>
             )}
 
-            {isModerator && (
+            {isModerator || thread.creator === currentUserUID ? (
               <div className='moderator'>
                 Moderator stuff:<br />
                 <ul>
@@ -283,7 +283,7 @@ const ThreadDetailPage: React.FC = () => {
                   </li>
                 </ul>
               </div>
-            )}
+            ) : null}
           </div>
         ) : (
           <p>Loading thread...</p>
