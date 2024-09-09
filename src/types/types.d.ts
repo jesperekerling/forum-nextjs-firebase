@@ -18,6 +18,7 @@ export type Thread = {
   creationDate: Timestamp;
   description: string;
   creator: string; // UID of the creator
+  isLocked: boolean;
 };
 
 export type User = {
