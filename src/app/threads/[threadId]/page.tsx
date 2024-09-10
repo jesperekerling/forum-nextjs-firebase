@@ -244,18 +244,7 @@ const ThreadDetailPage: React.FC = () => {
             <p className="text-gray-800 mb-4 text-lg" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500"><strong>Created by:</strong> {creatorName}</p>
             <p className="text-sm text-gray-500 pt-1">
-              <strong>Date:</strong> {new Intl.DateTimeFormat('sv-SE', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-              }).format(
-                thread.creationDate instanceof Timestamp
-                  ? thread.creationDate.toDate()
-                  : new Date(thread.creationDate)
-              )}
+              <strong>Date:</strong> {thread.createdAt ? thread.createdAt.toString() : 'N/A'}
             </p>
             <p className="text-sm text-gray-500 py-1"><strong>Category:</strong> {thread.category}</p>
             {thread.tags && thread.tags.length > 0 && (
@@ -331,18 +320,7 @@ const ThreadDetailPage: React.FC = () => {
                   {comment.content}
                 </p>
                 <p className="text-sm text-gray-500 py-1">
-                  Posted by {usernames[comment.creator] || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                  }).format(
-                    comment.createdAt instanceof Timestamp
-                      ? comment.createdAt.toDate()
-                      : new Date(comment.createdAt)
-                  )}
+                  Posted by {usernames[comment.creator] || 'Unknown'} at {comment.createdAt ? comment.createdAt.toString() : 'N/A'}
                 </p>
                 {comment.isCorrectAnswer && (
                   <p className="text-sm text-blue-700 font-bold">

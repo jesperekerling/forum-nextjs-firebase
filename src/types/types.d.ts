@@ -16,7 +16,7 @@ export type Thread = {
   id: string;
   title: string;
   category: ThreadCategory;
-  creationDate: Timestamp;
+  createdAt: Timestamp;
   description: string;
   creator: string; // UID of the creator
   isLocked: boolean;

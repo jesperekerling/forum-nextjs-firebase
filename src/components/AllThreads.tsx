@@ -1,9 +1,8 @@
-import { db } from '@/firebase';
-import { Thread, User } from '@/types/types';
-import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, orderBy, Timestamp } from 'firebase/firestore';
+import { db } from '@/firebase';
+import Link from 'next/link';
+import { Thread, User } from '@/types/types';
 
 type ThreadCategory = "THREAD" | "QNA";
 
@@ -52,6 +51,16 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
     }
   }, [initialThreads]);
 
+  const formatDate = (timestamp: Timestamp | Date) => {
+    if (timestamp instanceof Timestamp) {
+      return timestamp.toDate().toLocaleString();
+    } else if (timestamp instanceof Date) {
+      return timestamp.toLocaleString();
+    } else {
+      return 'Invalid date';
+    }
+  };
+
   return (
     <div className="container mx-auto">
       {showHeadline && <h2 className="font-bold text-xl pb-3">Latest Threads</h2>}
@@ -78,18 +87,7 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
                   </div>
                   <p className="text-sm text-gray-500">Created by: {users[thread.creator]?.userName || 'Unknown'}</p>
                   <p className="text-sm text-gray-500">
-                    {new Intl.DateTimeFormat('sv-SE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    }).format(
-                      thread.creationDate instanceof Timestamp
-                        ? thread.creationDate.toDate()
-                        : new Date(thread.creationDate)
-                    )}
+                    Updated at: {formatDate(thread.updatedAt)}
                   </p>
                 </div>
               </Link>
