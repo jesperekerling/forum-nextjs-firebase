@@ -93,7 +93,7 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
         <p>No threads available.</p>
       )}
       <div className="pt-5 pb-10 mx-auto text-center">
-        <a href="/threads" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">View All Threads</a>
+        <a href="/threads" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">Go to Threads</a>
       </div>
     </div>
   );

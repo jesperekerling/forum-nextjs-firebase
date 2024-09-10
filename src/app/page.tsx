@@ -59,10 +59,14 @@ const Page = () => {
         
         <h1 className="text-2xl font-bold pb-10 text-center">Forum</h1>
         
-        <ListThreads />
-
-        <UpdatedThreads />
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div>
+            <ListThreads />
+          </div>
+          <div>
+            <UpdatedThreads />
+          </div>
+        </div>
       </div>
     </main>
   );
