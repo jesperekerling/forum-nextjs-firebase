@@ -29,10 +29,10 @@ const TagsPage: React.FC = () => {
       <div className="container mx-auto p-4">
         <h2 className="font-bold text-xl pb-3">All Tags</h2>
         {tags.length > 0 ? (
-          <ul>
+          <ul className='flex flex-wrap gap-5 mt-10'>
             {tags.map((tag) => (
-              <li key={tag}>
-                <Link href={`/tags/${tag}`}>
+              <li key={tag} className='py-3'>
+                <Link href={`/tags/${tag}`} className='bg-white shadow-md rounded-lg p-4 hover:opacity-65'>
                   <span className="text-blue-500 hover:underline">{tag}</span>
                 </Link>
               </li>

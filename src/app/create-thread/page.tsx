@@ -89,7 +89,8 @@ const CreateThreadPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-10 bg-white shadow-md rounded mb-4">
+        <h1 className='text-2xl font-bold py-5'>Create Thread</h1>
         {isLoggedIn && isModerator ? (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -162,7 +163,7 @@ const CreateThreadPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="bg-black hover:bg-blue-700 text-white font-semibold py-3 px-5 mt-3 rounded-md focus:outline-none focus:shadow-outline"
+              className="bg-black hover:bg-opacity-70 text-white font-semibold py-3 px-5 mt-3 rounded-md focus:outline-none focus:shadow-outline"
             >
               Create Thread
             </button>

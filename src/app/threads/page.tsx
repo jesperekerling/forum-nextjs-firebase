@@ -1,7 +1,7 @@
 "use client";
 import Header from "@/components/layout/Header";
 import React from "react";
-import AllThreads from "@/components/AllThreads";
+import ListThreads from "@/components/AllThreads";
 
 const AllThreadsPage = () => {
   return (
@@ -9,7 +9,7 @@ const AllThreadsPage = () => {
       
       <Header />
       
-      <AllThreads />
+      <ListThreads />
 
     </main>
   );

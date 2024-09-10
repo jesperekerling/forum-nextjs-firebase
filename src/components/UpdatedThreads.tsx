@@ -4,12 +4,12 @@ import { db } from '@/firebase';
 import Link from 'next/link';
 import { Thread, User } from '@/types/types';
 
-interface AllThreadsProps {
+interface UpdatedThreadsProps {
   threads?: Thread[];
   showHeadline?: boolean;
 }
 
-const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHeadline = true }) => {
+const UpdatedThreads: React.FC<UpdatedThreadsProps> = ({ threads: initialThreads, showHeadline = true }) => {
   const [threads, setThreads] = useState<Thread[]>(initialThreads || []);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
 
@@ -19,7 +19,7 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
         try {
           const threadsQuery = query(
             collection(db, 'threads'),
-            orderBy('createdAt', 'desc'),
+            orderBy('updatedAt', 'desc'),
             limit(4)
           );
           const threadsSnapshot = await getDocs(threadsQuery);
@@ -57,13 +57,13 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
 
   return (
     <div>
-      {showHeadline && <h2 className="font-bold text-xl pb-3">Latest Threads</h2>}
+      {showHeadline && <h2 className="font-bold text-xl py-5">Latest Comments</h2>}
       {threads.length > 0 ? (
         <ul>
           {threads.map((thread) => (
             <li key={thread.id}>
               <Link href={`/threads/${thread.id}`}>
-                <div className='bg-white shadow-md rounded-lg p-6 my-5 hover:opacity-65'>
+                <div className='bg-white shadow-md rounded-lg p-6 mb-6 hover:opacity-65'>
                   <div className='flex'>
                     <h2 className='font-semibold flex-1 dark:text-black text-lg'>
                       {thread.title}
@@ -79,9 +79,9 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
                       minute: '2-digit',
                       second: '2-digit'
                     }).format(
-                      thread.createdAt instanceof Timestamp
-                        ? thread.createdAt.toDate()
-                        : new Date(thread.createdAt)
+                      thread.updatedAt instanceof Timestamp
+                        ? thread.updatedAt.toDate()
+                        : new Date(thread.updatedAt)
                     )}
                   </p>
                 </div>
@@ -92,11 +92,11 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
       ) : (
         <p>No threads available.</p>
       )}
-      <div className="pt-5 pb-10 mx-auto text-center">
-        <a href="/threads" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">View All Threads</a>
+      <div className="pt-5 py-10 mx-auto text-center">
+        <a href="/comments" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">View All Comments</a>
       </div>
     </div>
   );
 };
 
-export default AllThreads;
+export default UpdatedThreads;

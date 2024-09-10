@@ -7,6 +7,7 @@ import Header from "../components/layout/Header";
 import { testFirestore } from "../firebase"; // Adjust the path as necessary
 import dynamic from "next/dynamic";
 import ListThreads from "@/components/ListThreads";
+import UpdatedThreads from "@/components/UpdatedThreads";
 import {auth} from '../firebase'
 
 const Page = () => {
@@ -58,15 +59,9 @@ const Page = () => {
         
         <h1 className="text-2xl font-bold pb-10 text-center">Forum</h1>
         
-        <div className="pt-2 mx-auto text-right">
-          <a href="/create-thread" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">Create Thread</a>
-        </div>
-
         <ListThreads />
 
-        <div className="pt-10 mx-auto text-center">
-          <a href="/threads" className="bg-black text-white py-3 px-5 rounded-md dark:text-black dark:bg-white hover:opacity-75">View All Threads</a>
-        </div>        
+        <UpdatedThreads />
 
       </div>
     </main>
