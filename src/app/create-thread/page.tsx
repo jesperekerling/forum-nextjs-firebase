@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { db } from '@/firebase';
-import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useRouter, usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import { User } from '@/types/types';
 
@@ -23,7 +23,6 @@ function CreateThreadPage() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsLoggedIn(true);
-
         // Fetch the current user's moderator status
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
@@ -56,32 +55,63 @@ function CreateThreadPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim()) return;
-
-    try {
-      await addDoc(collection(db, 'threads'), {
-        title,
-        description,
-        category,
-        tags,
-        creator: getAuth().currentUser?.uid,
-        creationDate: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        isLocked: false,
-      });
-      router.push('/threads');
-    } catch (error) {
-      console.error('Error creating thread:', error);
+    const pathname = usePathname();
+    const threadIdMatch = pathname?.match(/\/threads\/([^\/]+)\/edit/);
+    const threadId = threadIdMatch ? threadIdMatch[1] : null;
+    if (threadId) {
+      try {
+        const updatedData = {
+          title,
+          description,
+          category,
+          tags,
+          updatedAt: serverTimestamp(),
+        };
+        await updateDoc(doc(db, 'threads', threadId), updatedData);
+  
+        // Update tags collection
+        const batch = writeBatch(db);
+        const threadDoc = await getDoc(doc(db, 'threads', threadId));
+        const thread = threadDoc.exists() ? threadDoc.data() : {};
+        const oldTags = thread.tags || [];
+        const newTags = tags;
+  
+        // Remove thread ID from old tags
+        for (const tag of oldTags) {
+          const tagRef = doc(db, 'tags', tag);
+          const tagDoc = await getDoc(tagRef);
+          if (tagDoc.exists()) {
+            batch.update(tagRef, { threadIds: arrayRemove(threadId) });
+          }
+        }
+  
+        // Add thread ID to new tags
+        for (const tag of newTags) {
+          const tagRef = doc(db, 'tags', tag);
+          const tagDoc = await getDoc(tagRef);
+          if (!tagDoc.exists()) {
+            batch.set(tagRef, { threadIds: [threadId] });
+          } else {
+            batch.update(tagRef, { threadIds: arrayUnion(threadId) });
+          }
+        }
+  
+        await batch.commit();
+  
+        router.push(`/threads/${threadId}`);
+      } catch (error) {
+        console.error('Error updating thread:', error);
+      }
     }
   };
 
   return (
     <div className='mx-auto container'>
       <Header />
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Create New Thread</h1>
+      <div className="container mx-auto bg-white shadow-md rounded-md p-8 mb-4">
+        <h1 className="text-2xl font-bold mb-4 text-center">Create New Thread</h1>
         {isLoggedIn ? (
-          <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <form onSubmit={handleSubmit} className="">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
                 Title
@@ -153,7 +183,7 @@ function CreateThreadPage() {
             </div>
             <button
               type="submit"
-              className="bg-black hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-black hover:bg-blue-700 text-white font-semibold py-3 px-5 mt-3 rounded-md focus:outline-none focus:shadow-outline"
             >
               Create Thread
             </button>

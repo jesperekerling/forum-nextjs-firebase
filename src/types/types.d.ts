@@ -32,3 +32,8 @@ export type User = {
   userUID: string;
   isModerator: boolean;
 };
+
+export type Tag = {
+  id: string;
+  threadIds: string[];
+};

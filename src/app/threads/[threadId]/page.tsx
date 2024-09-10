@@ -241,10 +241,10 @@ const ThreadDetailPage: React.FC = () => {
         {thread ? (
           <div className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
-            <p className="text-gray-700 mb-4" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
-            <p className="text-sm text-gray-500">Created by: {creatorName}</p>
-            <p className="text-sm text-gray-500">
-              Creation Date: {new Intl.DateTimeFormat('sv-SE', {
+            <p className="text-gray-800 mb-4 text-lg" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
+            <p className="text-sm text-gray-500"><strong>Created by:</strong> {creatorName}</p>
+            <p className="text-sm text-gray-500 pt-1">
+              <strong>Date:</strong> {new Intl.DateTimeFormat('sv-SE', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -257,15 +257,18 @@ const ThreadDetailPage: React.FC = () => {
                   : new Date(thread.creationDate)
               )}
             </p>
-            <p className="text-sm text-gray-500">Category: {thread.category}</p>
+            <p className="text-sm text-gray-500 py-1"><strong>Category:</strong> {thread.category}</p>
             {thread.tags && thread.tags.length > 0 && (
-              <p className="text-sm text-gray-500">Tags: {thread.tags.join(', ')}</p>
+              <p className="text-sm text-gray-500"><strong>Tags:</strong> {thread.tags.map(tag => (
+                <Link key={tag} href={`/tags/${tag}`}>
+                  <span className="text-blue-500 hover:underline mx-1">{tag}</span>
+                </Link>
+              ))}</p>
             )}
-
             {isModerator || thread.creator === currentUserUID ? (
-              <div className='moderator'>
-                Moderator stuff:<br />
-                <ul>
+              <div className='moderator pt-4'>
+                <h3 className='py-4 font-bold'>Moderator actions:</h3>
+                <ul className='flex gap-4'>
                   <li>
                     <Link href={`/threads/${thread.id}/edit`}>
                       <span className='text-blue-500 hover:underline'>
@@ -321,10 +324,12 @@ const ThreadDetailPage: React.FC = () => {
             </div>
           )}
           <div className='mt-10'>
-            <h2 className="text-2xl font-bold my-4">Comments</h2>
+            <h2 className="text-2xl font-bold my-4 text-center">Comments</h2>
             {sortedComments.map((comment) => (
               <div key={comment.id} className={`bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-4 mb-4 ${comment.isCorrectAnswer ? 'bg-lightblue-100' : ''}`}>
-                <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
+                <p className="text-gray-800 dark:text-gray-200 text-lg">
+                  {comment.content}
+                </p>
                 <p className="text-sm text-gray-500 py-1">
                   Posted by {usernames[comment.creator] || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
                     year: 'numeric',
@@ -340,7 +345,9 @@ const ThreadDetailPage: React.FC = () => {
                   )}
                 </p>
                 {comment.isCorrectAnswer && (
-                  <p className="text-sm text-blue-500 font-bold">Best answer yet, selected by Moderator</p>
+                  <p className="text-sm text-blue-700 font-bold">
+                    Select as best answer
+                  </p>
                 )}
                 {isModerator && thread?.category === 'QNA' && (
                   <>

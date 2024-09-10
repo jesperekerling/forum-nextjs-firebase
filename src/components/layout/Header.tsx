@@ -53,6 +53,7 @@ function Header() {
         <ul className='flex flex-1 gap-4 py-3'>
             <li><Link href="/threads">Threads</Link></li>
             <li><Link href="/comments">Comments</Link></li>
+            <li><Link href="/tags">Tags</Link></li>
             {isLoggedIn ? (
             <>
                 <li className='flex-1 text-right pr-5 hidden md:inline-block'>
