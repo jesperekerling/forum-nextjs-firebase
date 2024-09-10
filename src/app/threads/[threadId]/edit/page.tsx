@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { db } from '@/firebase';
-import { doc, getDoc, updateDoc, serverTimestamp, writeBatch, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, writeBatch, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
 import { Thread, User } from '@/types/types';
@@ -97,26 +97,26 @@ const EditThreadPage: React.FC = () => {
           updatedAt: serverTimestamp(),
         };
         await updateDoc(doc(db, 'threads', threadId), updatedData);
-  
+
         // Update tags collection
         const batch = writeBatch(db);
         const oldTags = thread.tags || [];
         const newTags = tags;
-  
+
         // Remove thread ID from old tags
         oldTags.forEach(tag => {
           const tagRef = doc(db, 'tags', tag);
           batch.update(tagRef, { threadIds: arrayRemove(threadId) });
         });
-  
+
         // Add thread ID to new tags
         newTags.forEach(tag => {
           const tagRef = doc(db, 'tags', tag);
           batch.set(tagRef, { threadIds: arrayUnion(threadId) }, { merge: true });
         });
-  
+
         await batch.commit();
-  
+
         router.push(`/threads/${threadId}`);
       } catch (error) {
         console.error('Error updating thread:', error);

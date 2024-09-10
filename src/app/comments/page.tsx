@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
-import { Thread, User } from '@/types/types';
+import { Thread, User, Comment } from '@/types/types';
 import { Timestamp } from 'firebase/firestore';
 import Header from '@/components/layout/Header';
 
@@ -14,16 +14,44 @@ const CommentsPage: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const q = query(collection(db, 'threads'), orderBy('updatedAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+      // Fetch the latest comments
+      const commentsQuery = query(
+        collection(db, 'comments'),
+        orderBy('createdAt', 'desc')
+      );
+      const commentsSnapshot = await getDocs(commentsQuery);
 
-      const threadsData = querySnapshot.docs.map(
+      const commentsData = commentsSnapshot.docs.map(
         (doc) =>
           ({
             id: doc.id,
             ...doc.data(),
-          } as Thread)
+          } as Comment)
       );
+
+      // Fetch the threads associated with the latest comments
+      const threadIds = Array.from(new Set(commentsData.map(comment => comment.threadId)));
+      const threadPromises = threadIds.map(threadId => getDoc(doc(db, 'threads', threadId)));
+      const threadDocs = await Promise.all(threadPromises);
+      const threadsData = threadDocs.map(threadDoc => {
+        if (threadDoc.exists()) {
+          return {
+            id: threadDoc.id,
+            ...threadDoc.data(),
+          } as Thread;
+        }
+        return null;
+      }).filter(thread => thread !== null) as Thread[];
+
+      // Sort threads based on the latest comment's createdAt field
+      threadsData.sort((a, b) => {
+        const latestCommentA = commentsData.find(comment => comment.threadId === a.id);
+        const latestCommentB = commentsData.find(comment => comment.threadId === b.id);
+        if (latestCommentA && latestCommentB) {
+          return latestCommentB.createdAt.toMillis() - latestCommentA.createdAt.toMillis();
+        }
+        return 0;
+      });
 
       setThreads(threadsData);
 

@@ -7,6 +7,7 @@ export type Comment = {
   creator: string;
   createdAt: Timestamp;
   isCorrectAnswer: boolean;
+  parentId?: string | null;
 };
 
 export type ThreadCategory = "THREAD" | "QNA" | "AD";
