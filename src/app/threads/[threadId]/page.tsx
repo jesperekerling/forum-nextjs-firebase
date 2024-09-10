@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { db } from '@/firebase';
@@ -244,7 +243,7 @@ const ThreadDetailPage: React.FC = () => {
             <p className="text-gray-800 mb-4 text-lg" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500"><strong>Created by:</strong> {creatorName}</p>
             <p className="text-sm text-gray-500 pt-1">
-              <strong>Date:</strong> {thread.createdAt ? thread.createdAt.toString() : 'N/A'}
+              <strong>Date:</strong> {thread.createdAt ? thread.createdAt.toDate().toLocaleString() : 'N/A'}
             </p>
             <p className="text-sm text-gray-500 py-1"><strong>Category:</strong> {thread.category}</p>
             {thread.tags && thread.tags.length > 0 && (
@@ -320,7 +319,7 @@ const ThreadDetailPage: React.FC = () => {
                   {comment.content}
                 </p>
                 <p className="text-sm text-gray-500 py-1">
-                  Posted by {usernames[comment.creator] || 'Unknown'} at {comment.createdAt ? comment.createdAt.toString() : 'N/A'}
+                  Posted by {usernames[comment.creator] || 'Unknown'} at {comment.createdAt ? comment.createdAt.toDate().toLocaleString() : 'N/A'}
                 </p>
                 {comment.isCorrectAnswer && (
                   <p className="text-sm text-blue-700 font-bold">

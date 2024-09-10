@@ -28,7 +28,9 @@ const CommentsPage: React.FC = () => {
       setThreads(threadsData);
 
       // Fetch user details for each thread creator
-      const userPromises = threadsData.map(thread => getDoc(doc(db, 'users', thread.creator)));
+      const userPromises = threadsData
+        .filter(thread => thread.creator) // Ensure creator is defined
+        .map(thread => getDoc(doc(db, 'users', thread.creator)));
       const userDocs = await Promise.all(userPromises);
       const usersData = userDocs.reduce((acc, userDoc) => {
         if (userDoc.exists()) {

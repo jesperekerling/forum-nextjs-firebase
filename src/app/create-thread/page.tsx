@@ -67,7 +67,7 @@ const CreateThreadPage: React.FC = () => {
           tags,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          userId: currentUserUID,
+          creator: currentUserUID,
         };
         const docRef = await addDoc(collection(db, 'threads'), newThread);
 
