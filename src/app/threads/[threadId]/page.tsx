@@ -123,7 +123,7 @@ const ThreadDetailPage: React.FC = () => {
         } as Comment;
         setComments([...comments, addedComment]);
         setNewComment('');
-
+  
         // Fetch the username for the new comment creator
         if (!usernames[currentUserUID]) {
           const userDoc = await getDoc(doc(db, 'users', currentUserUID));
@@ -135,12 +135,12 @@ const ThreadDetailPage: React.FC = () => {
             }));
           }
         }
-
+  
         // Update the thread's updatedAt timestamp
         await setDoc(doc(db, 'threads', threadId), {
           updatedAt: serverTimestamp()
         }, { merge: true });
-
+  
       } catch (error) {
         console.error('Error adding comment:', error);
       }
@@ -228,7 +228,11 @@ const ThreadDetailPage: React.FC = () => {
     }
   };
 
-  const sortedComments = comments.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+  const sortedComments = comments.sort((a, b) => {
+    if (a.isCorrectAnswer) return -1;
+    if (b.isCorrectAnswer) return 1;
+    return new Date(b.createdAt.toDate()).getTime() - new Date(a.createdAt.toDate()).getTime();
+  });
 
   return (
     <div className='mx-auto container'>
@@ -310,14 +314,18 @@ const ThreadDetailPage: React.FC = () => {
             </div>
           )}
           {isLocked && (
-            <p className="text-red-500">This thread is locked. No new comments can be posted.</p>
+            <div className='bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-6'>
+              <h3 className='text-xl font-bold pb-4'>Locked Thread</h3>
+              <p className="">
+                This thread is locked. No new comments can be posted.</p>
+            </div>
           )}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Comments</h2>
+          <div className='mt-10'>
+            <h2 className="text-2xl font-bold my-4">Comments</h2>
             {sortedComments.map((comment) => (
               <div key={comment.id} className={`bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-4 mb-4 ${comment.isCorrectAnswer ? 'bg-lightblue-100' : ''}`}>
                 <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 py-1">
                   Posted by {usernames[comment.creator] || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
                     year: 'numeric',
                     month: 'long',
