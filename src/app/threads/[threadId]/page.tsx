@@ -240,11 +240,11 @@ const ThreadDetailPage: React.FC = () => {
         {thread ? (
           <div className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-4 dark:text-black">{thread.title}</h1>
-            <p className="text-gray-800 mb-4 text-lg" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
-            <p className="text-sm text-gray-500"><strong>Created by:</strong> {creatorName}</p>
-            <p className="text-sm text-gray-500 pt-1">
-              <strong>Date:</strong> {thread.createdAt ? thread.createdAt.toDate().toLocaleString() : 'N/A'}
+            <p className="text-sm text-gray-500 pb-4"><strong>Posted by:</strong> {creatorName}
+                        
+              <strong className='ml-4'>Date:</strong> {thread.createdAt ? thread.createdAt.toDate().toLocaleString() : 'N/A'}
             </p>
+            <p className="text-gray-800 mb-4 text-lg" style={{ whiteSpace: 'pre-wrap' }}>{thread.description}</p>
             <p className="text-sm text-gray-500 py-1"><strong>Category:</strong> {thread.category}</p>
             {thread.tags && thread.tags.length > 0 && (
               <p className="text-sm text-gray-500"><strong>Tags:</strong> {thread.tags.map(tag => (
