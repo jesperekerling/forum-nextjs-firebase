@@ -1,15 +1,17 @@
 'use client';
 
-import { db } from '@/firebase';
-import { collection, addDoc, serverTimestamp, writeBatch, doc, arrayUnion, getDoc } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { db } from '@/firebase';
+import { doc, getDoc, updateDoc, serverTimestamp, writeBatch, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '@/components/layout/Header';
-import { User } from '@/types/types';
+import { Thread, User } from '@/types/types';
 
-const CreateThreadPage: React.FC = () => {
+const EditThreadPage: React.FC = () => {
+  const pathname = usePathname();
   const router = useRouter();
+  const [thread, setThread] = useState<Thread | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('THREAD');
@@ -36,7 +38,32 @@ const CreateThreadPage: React.FC = () => {
         setIsLoggedIn(false);
       }
     });
-  }, []);
+
+    const threadIdMatch = pathname?.match(/\/threads\/([^\/]+)\/edit/);
+    const threadId = threadIdMatch ? threadIdMatch[1] : null;
+    if (threadId) {
+      const fetchThread = async () => {
+        try {
+          const threadDocRef = doc(db, 'threads', threadId);
+          const threadDoc = await getDoc(threadDocRef);
+          if (threadDoc.exists()) {
+            const threadData = threadDoc.data() as Thread;
+            setThread(threadData);
+            setTitle(threadData.title);
+            setDescription(threadData.description);
+            setCategory(threadData.category);
+            setTags(threadData.tags || []);
+          } else {
+            console.log('No such thread!');
+          }
+        } catch (error) {
+          console.error('Error fetching thread:', error);
+        }
+      };
+
+      fetchThread();
+    }
+  }, [pathname]);
 
   const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTagInput(e.target.value);
@@ -58,30 +85,41 @@ const CreateThreadPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentUserUID) {
+    const threadIdMatch = pathname?.match(/\/threads\/([^\/]+)\/edit/);
+    const threadId = threadIdMatch ? threadIdMatch[1] : null;
+    if (threadId && thread) {
       try {
-        const newThread = {
+        const updatedData = {
           title,
           description,
           category,
           tags,
-          createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          creator: currentUserUID,
         };
-        const docRef = await addDoc(collection(db, 'threads'), newThread);
+        await updateDoc(doc(db, 'threads', threadId), updatedData);
 
         // Update tags collection
         const batch = writeBatch(db);
-        tags.forEach(tag => {
+        const oldTags = thread.tags || [];
+        const newTags = tags;
+
+        // Remove thread ID from old tags
+        oldTags.forEach(tag => {
           const tagRef = doc(db, 'tags', tag);
-          batch.set(tagRef, { threadIds: arrayUnion(docRef.id) }, { merge: true });
+          batch.update(tagRef, { threadIds: arrayRemove(threadId) });
         });
+
+        // Add thread ID to new tags
+        newTags.forEach(tag => {
+          const tagRef = doc(db, 'tags', tag);
+          batch.set(tagRef, { threadIds: arrayUnion(threadId) }, { merge: true });
+        });
+
         await batch.commit();
 
-        router.push(`/threads/${docRef.id}`);
+        router.push(`/threads/${threadId}`);
       } catch (error) {
-        console.error('Error creating thread:', error);
+        console.error('Error updating thread:', error);
       }
     }
   };
@@ -90,8 +128,8 @@ const CreateThreadPage: React.FC = () => {
     <div>
       <Header />
       <div className="container mx-auto p-10 bg-white shadow-md rounded mb-4">
-        <h1 className='text-2xl font-bold py-5'>Create Thread</h1>
-        {isLoggedIn && isModerator ? (
+        <h1 className='text-2xl font-bold py-5'>Edit Thread</h1>
+        {isLoggedIn ? (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
@@ -130,7 +168,8 @@ const CreateThreadPage: React.FC = () => {
                 required
               >
                 <option value="THREAD">Thread</option>
-                <option value="ANNOUNCEMENT">Announcement</option>
+                <option value="QNA">QNA</option>
+                {isModerator && <option value="AD">AD</option>}
               </select>
             </div>
             <div className="mb-4">
@@ -163,17 +202,17 @@ const CreateThreadPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="bg-black hover:bg-opacity-70 text-white font-semibold py-3 px-5 mt-3 rounded-md focus:outline-none focus:shadow-outline"
+              className="bg-black hover:bg-opacity-65 text-white font-semibold py-3 px-5 mt-3 rounded-md focus:outline-none focus:shadow-outline"
             >
-              Create Thread
+              Update Thread
             </button>
           </form>
         ) : (
-          <p>Loading...</p>
+          <p className="text-red-500">Please log in to post a new thread.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default CreateThreadPage;
+export default EditThreadPage;
