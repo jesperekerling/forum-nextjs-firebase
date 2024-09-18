@@ -23,6 +23,9 @@ export default function RootLayout({
       <Head>
         <link rel="preconnect" href="https://forum-nextjs-afd91.firebaseapp.com" />
         <link rel="dns-prefetch" href="https://forum-nextjs-afd91.firebaseapp.com" />
+        <link rel="dns-prefetch" href="https://apis.google.com" />
+        <link rel="dns-prefetch" href="https://www.googleapis.com" />
+        <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
       </Head>
       <body className={inter.className}>{children}</body>
     </html>
