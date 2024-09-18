@@ -9,6 +9,7 @@ function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState('');
   const [username, setUsername] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,29 +48,49 @@ function Header() {
     }
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
-    <header className='bg-white dark:bg-black flex px-8 bg-opacity-85 rounded-lg mb-10'>
-        <span className='flex-none text-xl font-bold py-3 pr-10'><Link href="/" className='hover:opacity-60'>Forum</Link></span>
-        <ul className='flex flex-1 gap-4 py-3'>
-            <li><Link href="/threads" className='hover:opacity-60'>Threads</Link></li>
-            <li><Link href="/comments" className='hover:opacity-60'>Comments</Link></li>
-            <li><Link href="/tags" className='hover:opacity-60'>Tags</Link></li>
-            {isLoggedIn ? (
+    <header className='bg-white dark:bg-black flex flex-wrap items-center justify-between px-8 bg-opacity-85 rounded-lg mb-10'>
+      <span className='flex-none text-xl font-bold py-3 pr-10'>
+        <Link href="/" className='hover:opacity-60'>Forum</Link>
+      </span>
+      <button
+        className='block md:hidden text-xl ml-auto'
+        onClick={toggleMenu}
+      >
+        &#9776;
+      </button>
+      <div className='w-full md:flex md:items-center md:w-auto md:flex-1'>
+        <ul className={`flex flex-col md:flex-row flex-1 gap-4 py-3 items-center ${menuOpen ? 'block' : 'hidden'} md:flex md:justify-start`}>
+          <li><Link href="/threads" className='hover:opacity-60'>Threads</Link></li>
+          <li><Link href="/comments" className='hover:opacity-60'>Comments</Link></li>
+          <li><Link href="/tags" className='hover:opacity-60'>Tags</Link></li>
+          {isLoggedIn ? (
             <>
-                <li className='flex-1 text-right pr-5 hidden md:inline-block'>
-                  <span className='text-gray-600 dark:text-gray-200 text-xs pr-2'>Logged in as: </span> 
-                  {username}
-                </li>
-                <li className='flex-1 md:flex-none text-right'><button onClick={handleLogout} className='hover:opacity-60'>Logout</button></li>
-                {error && <li className="text-red-500">{error}</li>}
+              <li className='md:flex-1 text-right pr-5 hidden md:inline-block'>
+                <span className='text-gray-600 dark:text-gray-200 text-xs pr-2'>Logged in as: </span> 
+                {username}
+              </li>
+              <li className='md:flex-none text-right'>
+                <button onClick={handleLogout} className='hover:opacity-60'>Logout</button>
+              </li>
+              {error && <li className="text-red-500">{error}</li>}
             </>
-            ) : (
+          ) : (
             <>
-                <li className='sm:flex-1 text-right'><Link href="/login" className='hover:opacity-60'>Log in</Link></li>
-                <li className='text-right'><Link href="/register" className='hover:opacity-60'>Register</Link></li>
+              <li className='md:flex-1 text-right'>
+                <Link href="/login" className='hover:opacity-60'>Log in</Link>
+              </li>
+              <li className='text-right'>
+                <Link href="/register" className='hover:opacity-60'>Register</Link>
+              </li>
             </>
-            )}
+          )}
         </ul>
+      </div>
     </header>
   );
 }
