@@ -9,7 +9,7 @@ interface AllThreadsProps {
   showHeadline?: boolean;
 }
 
-const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHeadline = true }) => {
+const ListThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHeadline = true }) => {
   const [threads, setThreads] = useState<Thread[]>(initialThreads || []);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
 
@@ -99,4 +99,4 @@ const AllThreads: React.FC<AllThreadsProps> = ({ threads: initialThreads, showHe
   );
 };
 
-export default AllThreads;
+export default ListThreads;

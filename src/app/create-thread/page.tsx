@@ -18,6 +18,7 @@ const CreateThreadPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
   const [currentUserUID, setCurrentUserUID] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
@@ -35,6 +36,7 @@ const CreateThreadPage: React.FC = () => {
       } else {
         setIsLoggedIn(false);
       }
+      setLoading(false);
     });
   }, []);
 
@@ -90,8 +92,12 @@ const CreateThreadPage: React.FC = () => {
     <div>
       <Header />
       <div className="container mx-auto p-10 bg-white shadow-md rounded mb-4">
-        <h1 className='text-2xl font-bold py-5'>Create Thread</h1>
-        {isLoggedIn && isModerator ? (
+        <h1 className='text-2xl font-bold pb-5'>Create Thread</h1>
+        {loading ? (
+          <p>Loading...</p>
+        ) : !isLoggedIn ? (
+          <p>Please log in or register to post a new thread.</p>
+        ) : (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
@@ -130,7 +136,8 @@ const CreateThreadPage: React.FC = () => {
                 required
               >
                 <option value="THREAD">Thread</option>
-                <option value="ANNOUNCEMENT">Announcement</option>
+                {isModerator && <option value="ANNOUNCEMENT">Announcement</option>}
+                <option value="QNA">QNA</option>
               </select>
             </div>
             <div className="mb-4">
@@ -168,8 +175,6 @@ const CreateThreadPage: React.FC = () => {
               Create Thread
             </button>
           </form>
-        ) : (
-          <p>Loading...</p>
         )}
       </div>
     </div>
