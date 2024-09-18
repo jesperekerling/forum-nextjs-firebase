@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Head from "next/head";
 import "./globals.css";
 
 import { initializeApp } from "firebase/app";
@@ -19,6 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Head>
+        <link rel="preconnect" href="https://forum-nextjs-afd91.firebaseapp.com" />
+        <link rel="dns-prefetch" href="https://forum-nextjs-afd91.firebaseapp.com" />
+      </Head>
       <body className={inter.className}>{children}</body>
     </html>
   );
