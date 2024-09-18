@@ -51,7 +51,7 @@ const TagDetailsPage: React.FC = () => {
     <div className='mx-auto container'>
       <Header />
       <div className="container mx-auto p-4">
-        <h2 className="font-bold text-xl pb-3">Threads tagged with "{tag}"</h2>
+        <h2 className="font-bold text-xl pb-3">Threads tagged with &quot;{tag}&quot;</h2>
         <AllThreads threads={threads} showHeadline={false} />
       </div>
     </div>
