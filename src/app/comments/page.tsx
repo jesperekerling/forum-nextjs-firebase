@@ -83,13 +83,12 @@ const CommentsPage: React.FC = () => {
             {threads.map((thread) => (
               <li key={thread.id}>
                 <Link href={`/threads/${thread.id}`}>
-                  <div className='bg-white shadow-md rounded-lg p-6 mb-6 hover:opacity-65'>
-                    <div className='flex'>
+                  <div className='bg-white shadow-md rounded-lg p-6 mb-6 hover:opacity-65 flex'>
+                    <div className='flex-1'>
                       <h2 className='font-semibold flex-1 dark:text-black text-lg'>
                         {thread.title}
                       </h2>
-                      <span className='bg-gray-700 text-white px-2 py-1 text-sm rounded-md'>{thread.category}</span>
-                    </div>
+
                     <p className='text-sm text-gray-500'>
                       Posted by {users[thread.creator]?.userName || 'Unknown'} at {new Intl.DateTimeFormat('sv-SE', {
                         year: 'numeric',
@@ -104,6 +103,10 @@ const CommentsPage: React.FC = () => {
                           : new Date(thread.updatedAt)
                       )}
                     </p>
+                      </div>
+                      <div>
+                    <span className='bg-gray-700 text-white px-2 py-1 text-sm rounded-md'>{thread.category}</span>
+                    </div>
                   </div>
                 </Link>
               </li>
