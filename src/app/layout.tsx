@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import "./globals.css";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
@@ -27,7 +29,15 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googleapis.com" />
         <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
       </Head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        
+        <Header />
+
+        {children}
+        
+        <Footer />
+
+      </body>
     </html>
   );
 }

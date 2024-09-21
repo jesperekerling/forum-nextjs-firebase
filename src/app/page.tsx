@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Update import
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import Header from "../components/layout/Header";
 import { testFirestore } from "../firebase"; // Adjust the path as necessary
 import dynamic from "next/dynamic";
 import ListThreads from "@/components/ListThreads";
@@ -54,7 +53,7 @@ const Page = () => {
   return (
 
     <main className="container mx-auto">
-      <Header />
+      
       <div className="p-1">
         
         <h1 className="text-2xl font-bold pb-10 text-center">Forum</h1>
@@ -68,7 +67,9 @@ const Page = () => {
           </div>
         </div>
       </div>
+      
     </main>
+
   );
 };
 

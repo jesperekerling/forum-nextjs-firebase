@@ -5,7 +5,6 @@ import { collection, addDoc, serverTimestamp, writeBatch, doc, arrayUnion, getDo
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/layout/Header';
 import { User } from '@/types/types';
 
 const CreateThreadPage: React.FC = () => {
@@ -90,7 +89,6 @@ const CreateThreadPage: React.FC = () => {
 
   return (
     <div>
-      <Header />
       <div className="container mx-auto p-10 bg-white shadow-md rounded mb-4">
         <h1 className='text-2xl font-bold pb-5'>Create Thread</h1>
         {loading ? (

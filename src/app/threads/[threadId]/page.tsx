@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import { db } from '@/firebase';
 import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import Header from '@/components/layout/Header';
 import { Thread, User, Comment } from '@/types/types';
 import Link from 'next/link';
 
@@ -235,7 +234,6 @@ const ThreadDetailPage: React.FC = () => {
 
   return (
     <div className='mx-auto container'>
-      <Header />
       <div className="container mx-auto p-4">
         {thread ? (
           <div className="bg-white dark:bg-black dark:text-white shadow-md rounded-lg p-6 mb-6">
@@ -340,7 +338,7 @@ const ThreadDetailPage: React.FC = () => {
                         onClick={() => handleUnmarkAsCorrect(comment.id)}
                         className="text-red-500 hover:underline mt-2"
                       >
-                        Unmark as Correct Answer
+                        Unmark as the Best Answer
                       </button>
                     )}
                   </>

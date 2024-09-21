@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { db } from '@/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
 
 const TagsPage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
@@ -25,7 +24,6 @@ const TagsPage: React.FC = () => {
 
   return (
     <div className='mx-auto container'>
-      <Header />
       <div className="container mx-auto p-4">
         <h2 className="font-bold text-xl pb-3">All Tags</h2>
         {tags.length > 0 ? (

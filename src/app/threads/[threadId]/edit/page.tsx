@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { db } from '@/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp, writeBatch, arrayUnion, arrayRemove, setDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import Header from '@/components/layout/Header';
 import { Thread, User } from '@/types/types';
 
 const EditThreadPage: React.FC = () => {
@@ -134,7 +133,6 @@ const EditThreadPage: React.FC = () => {
 
   return (
     <div className='mx-auto container'>
-      <Header />
       <div className="container mx-auto p-10 bg-white shadow-md rounded mb-4">
         <h1 className="text-2xl font-bold mb-4">Edit Thread</h1>
         {thread ? (

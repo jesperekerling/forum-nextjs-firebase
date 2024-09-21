@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { db } from '@/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import Header from '@/components/layout/Header';
 import AllThreads from '@/components/AllThreads';
 import { Thread } from '@/types/types';
 
@@ -49,7 +48,6 @@ const TagDetailsPage: React.FC = () => {
 
   return (
     <div className='mx-auto container'>
-      <Header />
       <div className="container mx-auto p-4">
         <h2 className="font-bold text-xl pb-3">Threads tagged with &quot;{tag}&quot;</h2>
         <AllThreads threads={threads} showHeadline={false} />

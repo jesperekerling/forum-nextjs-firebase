@@ -6,7 +6,6 @@ import { collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/fires
 import Link from 'next/link';
 import { Thread, User, Comment } from '@/types/types';
 import { Timestamp } from 'firebase/firestore';
-import Header from '@/components/layout/Header';
 
 const CommentsPage: React.FC = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -74,7 +73,7 @@ const CommentsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto">
-      <Header />
+      
       <div className="container mx-auto p-4">
         <h2 className="font-bold text-xl pb-3">Latest Comments</h2>
         <p className='pb-7 text-sm text-gray-700 dark:text-gray-300'>Displaying the latest updated threads based on comments.</p>
