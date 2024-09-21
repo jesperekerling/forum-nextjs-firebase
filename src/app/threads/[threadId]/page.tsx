@@ -323,7 +323,7 @@ const ThreadDetailPage: React.FC = () => {
                 </p>
                 {comment.isCorrectAnswer && (
                   <p className="text-sm text-blue-700 font-bold">
-                    Select as best answer
+                    Selected as the best answer
                   </p>
                 )}
                 {isModerator && thread?.category === 'QNA' && (
